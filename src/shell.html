@@ -1,0 +1,67 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,"><title>环带突击 · ORBITAL SPEAR</title>
+<style>
+:root{--ink:#e9eef2;--dim:rgba(233,238,242,.52);--line:rgba(190,214,230,.22);--acc:#ff9a45;--cy:#6fe3ff}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;color:var(--ink);font:500 12px/1.55 ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;user-select:none}
+canvas#c{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;display:block;cursor:grab;outline:none}
+canvas#c:active{cursor:grabbing}
+#cine{position:fixed;inset:0;pointer-events:none;z-index:2}
+#cine:before,#cine:after{content:"";position:absolute;left:0;right:0;height:5.4vh;background:#000;opacity:.92}
+#cine:before{top:0}#cine:after{bottom:0}
+#ld{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 58%,#0b141c 0,#000 74%);transition:opacity .9s;z-index:9;letter-spacing:.22em}
+#ld b{font-family:"Arial Black",Arial,sans-serif;font-size:30px;font-weight:900;color:var(--ink);letter-spacing:.30em;padding-left:.30em}
+#ld b i{color:var(--acc);font-style:normal}
+#bar{width:240px;height:1px;background:var(--line);margin:24px 0 10px}
+#bar s{display:block;height:1px;width:0;background:var(--acc);box-shadow:0 0 9px var(--acc)}
+#st{font-size:10px;color:var(--dim)}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:4;transition:opacity .35s}
+#hud.min .hud-block{opacity:0}
+#hud.min .brand{opacity:1}
+.brand{position:absolute;left:3.2vw;top:calc(5.4vh + 22px);display:flex;gap:12px;align-items:flex-start}
+.brand .mark{width:26px;height:26px;border:1px solid var(--acc);position:relative;flex:none;margin-top:2px}
+.brand .mark:after{content:"";position:absolute;left:6px;top:6px;right:6px;bottom:6px;border:1px solid rgba(255,154,69,.5)}
+.brand h1{font:900 13px/1.1 "Arial Narrow",Arial,sans-serif;letter-spacing:.22em;margin:0 0 4px}
+.brand p{margin:0;font-size:9.5px;letter-spacing:.18em;color:var(--dim)}
+.brand em{color:var(--cy);font-style:normal}
+.tele{position:absolute;right:3.2vw;top:calc(5.4vh + 22px);text-align:right;font-size:10px;letter-spacing:.12em;color:var(--dim)}
+.tele b{color:var(--ink);font-weight:600}
+.tele .rec{color:var(--acc)}
+.tele .rec:before{content:"●";font-size:8px;margin-right:6px;vertical-align:1px;animation:blink 1.6s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.15}}
+.shot{position:absolute;left:3.2vw;bottom:calc(5.4vh + 26px);max-width:60vw}
+.shot .tag{font-size:9px;letter-spacing:.32em;color:var(--acc);margin-bottom:7px}
+.shot h2{margin:0;font:600 20px/1.2 "Microsoft YaHei",system-ui,sans-serif;letter-spacing:.12em;text-shadow:0 1px 20px #000}
+.shot .meta{margin-top:8px;font-size:9.5px;color:var(--dim);letter-spacing:.16em}
+.keys{position:absolute;right:3.2vw;bottom:calc(5.4vh + 26px);text-align:right;font-size:9.5px;color:var(--dim);letter-spacing:.12em;line-height:1.9}
+.keys kbd{font:600 9px ui-monospace,monospace;color:var(--ink);border:1px solid var(--line);padding:1px 5px;margin-left:4px}
+.keys .dim{opacity:.6}
+#title{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:6;pointer-events:none;transition:opacity 1.8s ease, transform 1.8s ease}
+#title.out{opacity:0;transform:translateY(-14px)}
+#title .en{font:900 44px/1 "Arial Black",Arial,sans-serif;letter-spacing:.28em;padding-left:.28em;color:#f2f6f8;text-shadow:0 0 60px rgba(120,200,255,.22)}
+#title .cn{margin-top:16px;font:300 15px/1 "Microsoft YaHei",sans-serif;letter-spacing:.7em;padding-left:.7em;color:rgba(233,238,242,.72)}
+#title .ln{width:min(420px,44vw);height:1px;background:linear-gradient(90deg,transparent,rgba(255,154,69,.8),transparent);margin:22px 0}
+#title .sub{font-size:9.5px;letter-spacing:.34em;color:rgba(233,238,242,.42)}
+#msg{position:fixed;left:50%;top:calc(5.4vh + 18px);transform:translateX(-50%);padding:5px 15px;background:rgba(4,7,10,.62);border:1px solid var(--line);border-radius:999px;opacity:0;transition:opacity .3s;z-index:7;pointer-events:none;font-size:10px;letter-spacing:.16em}
+@media (max-width:760px){.keys{display:none}.shot h2{font-size:15px}#title .en{font-size:24px}}
+</style></head>
+<body><canvas id="c" tabindex="0"></canvas>
+<div id="cine"></div>
+<div id="ld"><b>ORBITAL<i>SPEAR</i></b><div id="bar"><s></s></div><div id="st">正在点火</div></div>
+<div id="hud">
+  <div class="brand hud-block"><div class="mark"></div><div><h1>CVN-09 · 镇星</h1><p>环带战役 / <em>ORBITAL SPEAR</em></p></div></div>
+  <div class="tele hud-block"><div><b id="fps">— FPS</b></div><div><span class="rec">REC</span> · <b id="tc">T+00:00.0</b></div><div>SECTOR 7 · 03:14:22</div></div>
+  <div class="shot hud-block"><div class="tag">SHOT</div><h2 id="shot">环带全景 · 镇星号</h2><div class="meta">50 mm · f/2.8 · 1/48 s · 真空外景</div></div>
+  <div class="keys hud-block">
+    <div><kbd>1</kbd>–<kbd>6</kbd> 机位</div>
+    <div><kbd>F</kbd> 电影 / 自由</div>
+    <div><kbd>W A S D</kbd><kbd>Q E</kbd> 移动 / 升降</div>
+    <div><kbd>拖拽</kbd> 转向 · <kbd>滚轮</kbd> 调速</div>
+    <div><kbd>P</kbd> 暂停 · <kbd>H</kbd> 收起界面</div>
+  </div>
+</div>
+<div id="title"><div class="en">ORBITAL SPEAR</div><div class="cn">环 带 突 击</div><div class="ln"></div><div class="sub">CVN-09 镇星号 · 第一舰载机甲队 · 弹射十二秒</div></div>
+<div id="msg"></div>
+<script>{{THREE}}</script>
+<script>
+{{APP}}
+</script></body></html>
